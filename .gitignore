@@ -13,6 +13,8 @@
 /dist/output/
 /vercel-upload-service/dist/output/
 /vercel-upload-service/dist/download/
+/vercel-deploy-service/dist/output/
+/vercel-deploy-service/dist/download/
 
 
 # Ignore package manager directories
@@ -20,6 +22,7 @@ node_modules/
 vendor/
 output/
 /vercel-upload-service/node_modules/
+/vercel-deploy-service/node_modules/
 
 
 # Ignore log files
@@ -39,3 +42,4 @@ Thumbs.db
 
 # Ignore the env files
 /vercel-upload-service/.env
+/vercel-deploy-service/.env
