@@ -5,8 +5,11 @@ import path from "path";
 
 import { generateRandomString } from "./utils";
 import { getAllFiles } from "./file";
+import { uploadFiles } from "./azure";
 
-
+import { createClient } from "redis";
+const publisher = createClient();
+publisher.connect();
 // import { createContainerFun } from "./azure";
 
 // uploadFiles("outputcontainer", "img/mountainnn.jpg", "/home/mahendra/Desktop/working dir/vercel-clone/dist/output/WoazH/src/assets/example.jpg");
@@ -29,9 +32,16 @@ app.post("/deploy", async (req, res) => {
     const files = getAllFiles(path.join(__dirname, `output/${id}`));
     console.log(files);
 
-    
+    files.forEach(file => {
+        let blobName = file.split(`output/${id}/`)[1];
+        // createContainerFun(id);
+        // uploadFiles(id, blobName, file);
+        blobName = path.join(id, blobName);
+        uploadFiles("outputcontainer", blobName, file);
+        // console.log(blobName);
+    });
 
-   
+    publisher.lPush("build-queue", id);
    
     res.json({id:id});
 });

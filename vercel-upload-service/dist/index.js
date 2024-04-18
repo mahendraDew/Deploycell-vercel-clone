@@ -19,9 +19,6 @@ const path_1 = __importDefault(require("path"));
 const utils_1 = require("./utils");
 const file_1 = require("./file");
 const azure_1 = require("./azure");
-const redis_1 = require("redis");
-const publisher = (0, redis_1.createClient)();
-publisher.connect();
 // import { createContainerFun } from "./azure";
 // uploadFiles("outputcontainer", "img/mountainnn.jpg", "/home/mahendra/Desktop/working dir/vercel-clone/dist/output/WoazH/src/assets/example.jpg");
 // createContainerFun("output-container", "WoazH/img/mountainnn.jpg", "/home/mahendra/Desktop/working dir/vercel-clone/dist/output/WoazH/src/assets/example.jpg");
@@ -45,7 +42,6 @@ app.post("/deploy", (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         (0, azure_1.uploadFiles)("outputcontainer", blobName, file);
         // console.log(blobName);
     });
-    publisher.lPush("build-queue", id);
     res.json({ id: id });
 }));
 app.listen(3000, () => {
