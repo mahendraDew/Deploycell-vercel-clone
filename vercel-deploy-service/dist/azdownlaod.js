@@ -38,7 +38,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.downloadBlobFun = void 0;
+exports.copyFinalDist = exports.downloadBlobFun = void 0;
 const storage_blob_1 = require("@azure/storage-blob");
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
@@ -114,3 +114,40 @@ function downloadBlobFun(blobName, containerName) {
         .catch(error => console.error('Error downloading file(exp fun):', error));
 }
 exports.downloadBlobFun = downloadBlobFun;
+function copyFinalDist(id) {
+    const folderPath = path.join(__dirname, `output/${id}/dist`);
+    const allFiles = getAllFiles(folderPath);
+    console.log(allFiles);
+    allFiles.forEach(file => {
+        const fileName = path.join(id, file.split(`output/${id}/dist`)[1]);
+        uploadFile("distcontainer", fileName, file);
+        // console.log(file.split(`output/${id}/`)[1]);
+    });
+}
+exports.copyFinalDist = copyFinalDist;
+function getAllFiles(folderPath) {
+    let response = [];
+    const allFilesAndFolders = fs.readdirSync(folderPath);
+    allFilesAndFolders.forEach(file => {
+        const fullFilePath = path.join(folderPath, file);
+        if (fs.statSync(fullFilePath).isDirectory()) {
+            response = response.concat(getAllFiles(fullFilePath));
+        }
+        else {
+            response.push(fullFilePath);
+        }
+    });
+    return response;
+}
+function uploadFile(containerName, blobName, localFilePath) {
+    return __awaiter(this, void 0, void 0, function* () {
+        console.log("Assests Uploading started...");
+        // Create the container if it doesn't exist and if exist then put items in that same container
+        // await createContainer(containerName);
+        const containerClient = blobServiceClient.getContainerClient(containerName); //container name - individual output folders
+        const blockBlobClient = containerClient.getBlockBlobClient(blobName); //file name
+        // Upload the file
+        yield blockBlobClient.uploadFile(localFilePath); // local file path
+        console.log(`File "${blobName}" uploaded successfully.`);
+    });
+}

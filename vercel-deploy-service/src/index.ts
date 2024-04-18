@@ -1,6 +1,6 @@
 import { createClient, commandOptions } from "redis";
-import { downloadAzureFiles } from "./azure";
-import { downloadBlobFun } from "./azdownlaod";
+import { copyFinalDist, downloadBlobFun } from "./azdownlaod";
+import { buildProject } from "./utils";
 const subscriber = createClient();
 subscriber.connect();
 
@@ -18,6 +18,8 @@ async function main() {
 
         // await downloadAzureFiles(`output/${id}`)
         await downloadBlobFun(id ?? '', containerName);
+        await buildProject(id ?? '');
+        await copyFinalDist(id ?? '');
     }
         // await downloadAzureFiles("p8Q0C");
 

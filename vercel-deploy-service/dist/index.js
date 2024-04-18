@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const redis_1 = require("redis");
 const azdownlaod_1 = require("./azdownlaod");
+const utils_1 = require("./utils");
 const subscriber = (0, redis_1.createClient)();
 subscriber.connect();
 function main() {
@@ -23,6 +24,8 @@ function main() {
             console.log(id);
             // await downloadAzureFiles(`output/${id}`)
             yield (0, azdownlaod_1.downloadBlobFun)(id !== null && id !== void 0 ? id : '', containerName);
+            yield (0, utils_1.buildProject)(id !== null && id !== void 0 ? id : '');
+            yield (0, azdownlaod_1.copyFinalDist)(id !== null && id !== void 0 ? id : '');
         }
         // await downloadAzureFiles("p8Q0C");
     });
