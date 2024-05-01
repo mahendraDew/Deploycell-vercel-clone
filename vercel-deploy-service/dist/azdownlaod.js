@@ -38,8 +38,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.copyFinalDist = exports.downloadBlobFun = void 0;
+exports.downloadBlobFun = void 0;
 const storage_blob_1 = require("@azure/storage-blob");
+const utils_1 = require("./utils");
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -80,6 +81,8 @@ function downloadBlob(containerName, blobName) {
         // console.log(`Total files downloaded: ${i}`);
         yield Promise.all(downloadPromises);
         console.log(`Total files downloaded: ${downloadPromises.length}`);
+        yield (0, utils_1.buildProject)(blobName !== null && blobName !== void 0 ? blobName : '');
+        yield copyFinalDist(blobName !== null && blobName !== void 0 ? blobName : '');
     });
 }
 function downloadFile(blobName, containerClient) {
@@ -124,7 +127,6 @@ function copyFinalDist(id) {
         // console.log(file.split(`output/${id}/`)[1]);
     });
 }
-exports.copyFinalDist = copyFinalDist;
 function getAllFiles(folderPath) {
     let response = [];
     const allFilesAndFolders = fs.readdirSync(folderPath);

@@ -1,4 +1,5 @@
 import { BlobServiceClient, StorageSharedKeyCredential } from '@azure/storage-blob';
+import { buildProject } from './utils';
 import * as fs from 'fs';
 import * as path from 'path';
 import dotenv from 'dotenv';
@@ -36,6 +37,8 @@ async function downloadBlob(containerName: string, blobName: string): Promise<vo
     await Promise.all(downloadPromises);
     console.log(`Total files downloaded: ${downloadPromises.length}`);
     
+    await buildProject(blobName ?? '');
+    await copyFinalDist(blobName ?? '');
     // //works for a single file
     // // Get a blob client from the container client
     // const blobClient = containerClient.getBlobClient(blobName);
@@ -77,9 +80,10 @@ export function downloadBlobFun(blobName: string, containerName: string){
         .then(() => console.log('File downloaded successfully'))
         .catch(error => console.error('Error downloading file(exp fun):', error));
 
+        
 }
 
-export function copyFinalDist(id: string){
+function copyFinalDist(id: string){
     const folderPath = path.join(__dirname, `output/${id}/dist`);
     const allFiles = getAllFiles(folderPath);
     console.log(allFiles);

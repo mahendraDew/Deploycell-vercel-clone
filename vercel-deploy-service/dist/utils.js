@@ -9,7 +9,10 @@ const path_1 = __importDefault(require("path"));
 function buildProject(id) {
     return new Promise((resolve) => {
         var _a, _b;
-        const child = (0, child_process_1.exec)(`cd ${path_1.default.join(__dirname, `output/${id}`)} && npm install && npm run build`);
+        const child = (0, child_process_1.spawn)("npm", ["install", "&&", "npm", "run", "build"], {
+            cwd: path_1.default.join(__dirname, `output/${id}`),
+            shell: true
+        });
         (_a = child.stdout) === null || _a === void 0 ? void 0 : _a.on('data', function (data) {
             console.log('stdout: ' + data);
         });
