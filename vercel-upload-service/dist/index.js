@@ -19,6 +19,11 @@ const path_1 = __importDefault(require("path"));
 const utils_1 = require("./utils");
 const file_1 = require("./file");
 const azure_1 = require("./azure");
+const redis_1 = require("redis");
+const publisher = (0, redis_1.createClient)();
+publisher.connect();
+const subscriber = (0, redis_1.createClient)();
+subscriber.connect();
 // import { createContainerFun } from "./azure";
 // uploadFiles("outputcontainer", "img/mountainnn.jpg", "/home/mahendra/Desktop/working dir/vercel-clone/dist/output/WoazH/src/assets/example.jpg");
 // createContainerFun("output-container", "WoazH/img/mountainnn.jpg", "/home/mahendra/Desktop/working dir/vercel-clone/dist/output/WoazH/src/assets/example.jpg");
@@ -42,7 +47,17 @@ app.post("/deploy", (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         (0, azure_1.uploadFiles)("outputcontainer", blobName, file);
         // console.log(blobName);
     });
+    yield new Promise((resolve) => setTimeout(resolve, 5000));
+    publisher.lPush("build-queue", id);
+    publisher.hSet("status", id, "uploaded");
     res.json({ id: id });
+}));
+app.get("/status", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.query.id;
+    const response = yield subscriber.hGet("status", id);
+    res.json({
+        status: response
+    });
 }));
 app.listen(3000, () => {
     console.log("Server is running on port 3000");

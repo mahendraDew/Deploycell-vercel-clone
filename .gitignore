@@ -15,6 +15,8 @@
 /vercel-upload-service/dist/download/
 /vercel-deploy-service/dist/output/
 /vercel-deploy-service/dist/download/
+/vercel-request-handler/dist/output/
+/vercel-request-handler/dist/download/
 
 
 # Ignore package manager directories
@@ -23,7 +25,8 @@ vendor/
 output/
 /vercel-upload-service/node_modules/
 /vercel-deploy-service/node_modules/
-
+/vercel-request-handler/node_modules/
+/frontend/node_modules/
 
 # Ignore log files
 *.log
@@ -43,3 +46,4 @@ Thumbs.db
 # Ignore the env files
 /vercel-upload-service/.env
 /vercel-deploy-service/.env
+/vercel-request-handler/.env

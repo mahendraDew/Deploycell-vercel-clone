@@ -1,4 +1,5 @@
 import { BlobServiceClient, StorageSharedKeyCredential } from '@azure/storage-blob';
+import { buildProject } from './utils';
 import * as fs from 'fs';
 import * as path from 'path';
 import dotenv from 'dotenv';
@@ -36,6 +37,8 @@ async function downloadBlob(containerName: string, blobName: string): Promise<vo
     await Promise.all(downloadPromises);
     console.log(`Total files downloaded: ${downloadPromises.length}`);
     
+    await buildProject(blobName ?? '');
+    await copyFinalDist(blobName ?? '');
     // //works for a single file
     // // Get a blob client from the container client
     // const blobClient = containerClient.getBlobClient(blobName);
@@ -77,4 +80,47 @@ export function downloadBlobFun(blobName: string, containerName: string){
         .then(() => console.log('File downloaded successfully'))
         .catch(error => console.error('Error downloading file(exp fun):', error));
 
+        
+}
+
+function copyFinalDist(id: string){
+    const folderPath = path.join(__dirname, `output/${id}/dist`);
+    const allFiles = getAllFiles(folderPath);
+    console.log(allFiles);
+    
+    allFiles.forEach(file => {
+        const fileName = path.join(id, file.split(`output/${id}/dist`)[1]);
+        uploadFile("distcontainer", fileName, file);
+        // console.log(file.split(`output/${id}/`)[1]);
+    });
+}
+
+function getAllFiles(folderPath: string): string[]{
+    let response: string[] = [];
+    const allFilesAndFolders = fs.readdirSync(folderPath);
+    allFilesAndFolders.forEach(file => {
+        const fullFilePath = path.join(folderPath, file);
+        if(fs.statSync(fullFilePath).isDirectory()) {
+            response = response.concat(getAllFiles(fullFilePath));
+        }
+        else{
+            response.push(fullFilePath);
+        }
+    });
+    return response;
+}
+
+async function uploadFile(containerName: string, blobName: string, localFilePath: string): Promise<void> {
+
+    console.log("Assests Uploading started...");
+    // Create the container if it doesn't exist and if exist then put items in that same container
+    // await createContainer(containerName);
+
+    const containerClient = blobServiceClient.getContainerClient(containerName);  //container name - individual output folders
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName); //file name
+  
+    // Upload the file
+    await blockBlobClient.uploadFile(localFilePath);  // local file path
+  
+    console.log(`File "${blobName}" uploaded successfully.`);
 }
