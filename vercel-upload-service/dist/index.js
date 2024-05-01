@@ -47,6 +47,7 @@ app.post("/deploy", (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         (0, azure_1.uploadFiles)("outputcontainer", blobName, file);
         // console.log(blobName);
     });
+    yield new Promise((resolve) => setTimeout(resolve, 5000));
     publisher.lPush("build-queue", id);
     publisher.hSet("status", id, "uploaded");
     res.json({ id: id });

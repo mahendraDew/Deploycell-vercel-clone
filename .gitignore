@@ -26,7 +26,7 @@ output/
 /vercel-upload-service/node_modules/
 /vercel-deploy-service/node_modules/
 /vercel-request-handler/node_modules/
-
+/frontend/node_modules/
 
 # Ignore log files
 *.log

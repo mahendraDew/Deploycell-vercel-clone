@@ -43,6 +43,8 @@ app.post("/deploy", async (req, res) => {
         // console.log(blobName);
     });
 
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+
     publisher.lPush("build-queue", id);
     publisher.hSet("status", id, "uploaded");
    
