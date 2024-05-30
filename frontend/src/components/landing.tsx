@@ -6,6 +6,7 @@ import { CardTitle, CardDescription, CardHeader, CardContent, Card } from "@/com
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import Navbar from "@/components/ui/nav"
 import { useState } from "react"
 import axios from "axios"
 
@@ -18,62 +19,65 @@ export function Landing() {
   const [deployed, setDeployed] = useState(false);
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-xl">Deploy your GitHub Repository</CardTitle>
-          <CardDescription>Enter the URL of your GitHub repository to deploy it</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="github-url">GitHub Repository URL</Label>
-              <Input 
-                onChange={(e) => {
-                  setRepoUrl(e.target.value);
-                }} 
-                placeholder="https://github.com/username/repo" 
-              />
-            </div>
-            <Button onClick={async () => {
-              setUploading(true);
-              const res = await axios.post(`${BACKEND_UPLOAD_URL}/deploy`, {
-                repoUrl: repoUrl
-              });
-              setUploadId(res.data.id);
-              setUploading(false);
-              const interval = setInterval(async () => {
-                const response = await axios.get(`${BACKEND_UPLOAD_URL}/status?id=${res.data.id}`);
+    <>
+      <Navbar />
+      <main className="flex flex-col items-center justify-center min-h-screen bg-neutral-950 dark:bg-gray-900 p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle className="text-xl">Deploy your GitHub Repository</CardTitle>
+            <CardDescription>Enter the URL of your GitHub repository to deploy it</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="github-url">GitHub Repository URL</Label>
+                <Input 
+                  onChange={(e) => {
+                    setRepoUrl(e.target.value);
+                  }} 
+                  placeholder="https://github.com/username/repo" 
+                />
+              </div>
+              <Button onClick={async () => {
+                setUploading(true);
+                const res = await axios.post(`${BACKEND_UPLOAD_URL}/deploy`, {
+                  repoUrl: repoUrl
+                });
+                setUploadId(res.data.id);
+                setUploading(false);
+                const interval = setInterval(async () => {
+                  const response = await axios.get(`${BACKEND_UPLOAD_URL}/status?id=${res.data.id}`);
 
-                if (response.data.status === "deployed") {
-                  clearInterval(interval);
-                  setDeployed(true);
-                }
-              }, 3000)
-            }} disabled={uploadId !== "" || uploading} className="w-full" type="submit">
-              {uploadId ? `Deploying (${uploadId})` : uploading ? "Uploading..." : "Upload"}
+                  if (response.data.status === "deployed") {
+                    clearInterval(interval);
+                    setDeployed(true);
+                  }
+                }, 3000)
+              }} disabled={uploadId !== "" || uploading} className="w-full" type="submit">
+                {uploadId ? `Deploying (${uploadId})` : uploading ? "Uploading..." : "Upload"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+        {deployed && <Card className="w-full max-w-md mt-8">
+          <CardHeader>
+            <CardTitle className="text-xl">Deployment Status</CardTitle>
+            <CardDescription>Your website is successfully deployed!</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <Label htmlFor="deployed-url">Deployed URL</Label>
+              <Input id="deployed-url" readOnly type="url" value={`http://${uploadId}.dev.100xdevs.com:3001/index.html`} />
+            </div>
+            <br />
+            <Button className="w-full" variant="outline">
+              <a href={`http://${uploadId}.10kdevs.com/index.html`} target="_blank">
+                Visit Website
+              </a>
             </Button>
-          </div>
-        </CardContent>
-      </Card>
-      {deployed && <Card className="w-full max-w-md mt-8">
-        <CardHeader>
-          <CardTitle className="text-xl">Deployment Status</CardTitle>
-          <CardDescription>Your website is successfully deployed!</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <Label htmlFor="deployed-url">Deployed URL</Label>
-            <Input id="deployed-url" readOnly type="url" value={`http://${uploadId}.dev.100xdevs.com:3001/index.html`} />
-          </div>
-          <br />
-          <Button className="w-full" variant="outline">
-            <a href={`http://${uploadId}.10kdevs.com/index.html`} target="_blank">
-              Visit Website
-            </a>
-          </Button>
-        </CardContent>
-      </Card>}
-    </main>
+          </CardContent>
+        </Card>}
+      </main>
+    </>
   )
 }
